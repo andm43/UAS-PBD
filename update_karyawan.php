@@ -1,12 +1,12 @@
 <?php
 include 'koneksi.php';
 
-// Memastikan ID karyawan disediakan melalui parameter GET
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
+// Pastikan ID karyawan disediakan melalui parameter GET
+if (isset($_GET['id_k'])) {
+    $id = intval($_GET['id_k']);
 
-    // Mengambil data karyawan berdasarkan ID
-    $result = $conn->query("SELECT * FROM karyawan WHERE id=$id");
+    // Mengambil data karyawan berdasarkan id_k
+    $result = $conn->query("SELECT * FROM karyawan WHERE id_k=$id");
     $karyawan = $result->fetch_assoc();
 
     if (!$karyawan) {
@@ -16,13 +16,23 @@ if (isset($_GET['id'])) {
     die("ID karyawan tidak disediakan.");
 }
 
+// Mapping departemen: id => nama departemen
+$departemenMapping = [
+    1 => 'HRD',
+    2 => 'Keuangan',
+    3 => 'IT',
+    4 => 'Pemasaran',
+    5 => 'Produksi'
+];
+
 // Proses pembaruan data karyawan ketika form disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Mengamankan input dari form
     $nip = $conn->real_escape_string($_POST['nip']);
     $nama = $conn->real_escape_string($_POST['nama']);
     $jabatan = $conn->real_escape_string($_POST['jabatan']);
-    $departemen = $conn->real_escape_string($_POST['departemen']); // ENUM sekarang
+    // Ambil departemen_id (bukan departemen, karena kolom di tabel adalah departemen_id)
+    $departemen_id = intval($_POST['departemen']);
     $email = $conn->real_escape_string($_POST['email']);
 
     // Proses upload foto jika ada file baru, jika tidak gunakan foto lama
@@ -32,18 +42,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
-        $foto = $uploadDir . basename($_FILES["foto"]["name"]);
-        move_uploaded_file($_FILES["foto"]["tmp_name"], $foto);
+        $fotoPath = $uploadDir . basename($_FILES["foto"]["name"]);
+        move_uploaded_file($_FILES["foto"]["tmp_name"], $fotoPath);
+        $foto = $fotoPath;
     }
 
-    // Menyusun query update untuk memperbarui data karyawan
+    // Menyusun query UPDATE untuk memperbarui data karyawan
     $sql = "UPDATE karyawan 
-            SET nip='$nip', nama='$nama', jabatan='$jabatan', 
-                departemen='$departemen', email='$email', foto='$foto' 
-            WHERE id=$id";
+            SET nip='$nip', 
+                nama='$nama', 
+                jabatan='$jabatan', 
+                departemen_id=$departemen_id, 
+                email='$email', 
+                foto='$foto' 
+            WHERE id_k=$id";
 
     if ($conn->query($sql) === TRUE) {
         echo "<div class='alert alert-success'>Data karyawan berhasil diperbarui.</div>";
+        // Update data $karyawan agar form menampilkan perubahan tanpa reload
+        $karyawan['nip'] = $nip;
+        $karyawan['nama'] = $nama;
+        $karyawan['jabatan'] = $jabatan;
+        $karyawan['departemen_id'] = $departemen_id;
+        $karyawan['email'] = $email;
+        $karyawan['foto'] = $foto;
     } else {
         echo "<div class='alert alert-danger'>Error: " . $conn->error . "</div>";
     }
@@ -55,6 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Edit Karyawan</title>
+    <link rel="icon" type="image/png" href="./component/logosmpegawai1.png">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
@@ -67,12 +90,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Field NIP -->
             <div class="mb-3">
                 <label for="nip" class="form-label">NIP</label>
-                <input type="text" name="nip" class="form-control" value="<?= $karyawan['nip'] ?>" required>
+                <input type="text" name="nip" class="form-control" value="<?= htmlspecialchars($karyawan['nip']) ?>"
+                    required>
             </div>
             <!-- Field Nama -->
             <div class="mb-3">
                 <label for="nama" class="form-label">Nama</label>
-                <input type="text" name="nama" class="form-control" value="<?= $karyawan['nama'] ?>" required>
+                <input type="text" name="nama" class="form-control" value="<?= htmlspecialchars($karyawan['nama']) ?>"
+                    required>
             </div>
             <!-- Dropdown untuk Jabatan -->
             <div class="mb-3">
@@ -88,16 +113,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     ?>
                 </select>
             </div>
-            <!-- Dropdown untuk Departemen menggunakan ENUM -->
+            <!-- Dropdown untuk Departemen -->
             <div class="mb-3">
                 <label for="departemen" class="form-label">Departemen</label>
                 <select name="departemen" class="form-select" required>
                     <?php
-                    // ENUM untuk departemen
-                    $departemenOptions = ['HRD', 'Keuangan', 'IT', 'Pemasaran', 'Produksi'];
-                    foreach ($departemenOptions as $option) {
-                        $selected = ($option == $karyawan['departemen']) ? "selected" : "";
-                        echo "<option value=\"$option\" $selected>$option</option>";
+                    // Tampilkan option berdasarkan mapping departemen
+                    foreach ($departemenMapping as $id_dep => $depName) {
+                        $selected = ($id_dep == $karyawan['departemen_id']) ? "selected" : "";
+                        echo "<option value=\"$id_dep\" $selected>$depName</option>";
                     }
                     ?>
                 </select>
@@ -105,14 +129,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Field Email -->
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" value="<?= $karyawan['email'] ?>" required>
+                <input type="email" name="email" class="form-control"
+                    value="<?= htmlspecialchars($karyawan['email']) ?>" required>
             </div>
             <!-- Field Foto (opsional) -->
             <div class="mb-3">
                 <label for="foto" class="form-label">Foto (opsional)</label>
                 <input type="file" name="foto" class="form-control">
                 <?php if ($karyawan['foto']): ?>
-                    <img src="<?= $karyawan['foto'] ?>" alt="Foto" width="100">
+                    <img src="<?= htmlspecialchars($karyawan['foto']) ?>" alt="Foto" width="100">
                 <?php endif; ?>
             </div>
             <button type="submit" class="btn btn-primary">Perbarui Karyawan</button>

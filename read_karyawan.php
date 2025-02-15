@@ -1,16 +1,30 @@
 <?php
 include 'koneksi.php';
 
-$result = $conn->query("SELECT id, nip, nama, jabatan, departemen, email, tanggal_masuk FROM karyawan");
+// Gunakan JOIN agar bisa menampilkan nama_departemen
+$sql = "
+    SELECT 
+        k.id_k,
+        k.nip,
+        k.nama,
+        k.jabatan,
+        d.nama_departemen,
+        k.email,
+        k.tanggal_masuk
+    FROM karyawan k
+    JOIN departemen d ON k.departemen_id = d.id_d
+";
 
+// Jalankan query
+$result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Karyawan</title>
+    <link rel="icon" type="image/png" href="./component/logosmpegawai1.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 
@@ -32,21 +46,22 @@ $result = $conn->query("SELECT id, nip, nama, jabatan, departemen, email, tangga
             <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <td><?= $row['nip'] ?></td>
-                        <td><?= $row['nama'] ?></td>
-                        <td><?= $row['jabatan'] ?></td>
-                        <td><?= $row['departemen'] ?></td>
-                        <td><?= $row['email'] ?></td>
-                        <td><?= $row['tanggal_masuk'] ?></td>
+                        <td><?= htmlspecialchars($row['nip']) ?></td>
+                        <td><?= htmlspecialchars($row['nama']) ?></td>
+                        <td><?= htmlspecialchars($row['jabatan']) ?></td>
+                        <td><?= htmlspecialchars($row['nama_departemen']) ?></td>
+                        <td><?= htmlspecialchars($row['email']) ?></td>
+                        <td><?= htmlspecialchars($row['tanggal_masuk']) ?></td>
                         <td>
-                            <a href="update_karyawan.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="delete_karyawan.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Yakin ingin menghapus?')">Hapus</a>
+                            <a href="update_karyawan.php?id_k=<?= $row['id_k'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="delete_karyawan.php?id_k=<?= $row['id_k'] ?>"
+                                onclick="return confirm('Yakin ingin menghapus?')" class="btn btn-danger btn-sm">Hapus</a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
+        <a href="create_karyawan.php" class="btn btn-primary">Tambah Karyawan</a>
         <a href="index.php" class="btn btn-secondary">Kembali</a>
     </div>
 </body>

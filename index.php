@@ -59,7 +59,7 @@
         <div class="container">
             <!-- Nama atau logo aplikasi -->
             <a class="navbar-brand" href="index.php">
-                <img src="./component/logosmpegawai1.png" alt="Logo Home" height="50px">
+                <img src="./component/logosmpegawai1.png" alt="Logo Home" height="40px">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,15 +68,16 @@
         </div>
     </nav>
 
-    <!-- Hero Section: Menampilkan judul utama dan tombol call-to-action -->
-    <div class="hero-section">
+    <!-- Hero Section: Menampilkan judul utama dengan background gambar gedung -->
+    <div class="hero-section"
+        style="background: url('https://i.pinimg.com/736x/7e/4d/35/7e4d3518c73e62fa88dba03054a36708.jpg') no-repeat center center/cover;">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="display-3">Sistem Manajemen Kepegawaian</h1>
-            <p class="lead">Kelola data karyawan, jabatan, dan departemen secara efisien.</p>
-            <a href="dashboard.php" class="btn btn-primary btn-lg mt-3">Mulai Sekarang</a>
+            <h1 class="display-3">Sistem Manajemen Pegawai</h1>
+            <p class="lead">Kelola data karyawan dan departemen secara efisien.</p>
         </div>
     </div>
+
 
     <!-- Fitur Section: Menampilkan card-card untuk fitur utama -->
     <div class="features bg-light py-5">
@@ -88,7 +89,7 @@
                         <div class="card-body">
                             <i class="bi bi-people-fill" style="font-size: 3rem;"></i>
                             <h5 class="card-title mt-3">Data Karyawan</h5>
-                            <p class="card-text">Kelola dan perbarui data karyawan dengan mudah.</p>
+                            <p class="card-text">Kelola dan perbarui data karyawan.</p>
                             <a href="read_karyawan.php" class="btn btn-outline-primary">Lihat Karyawan</a>
                         </div>
                     </div>
@@ -99,7 +100,7 @@
                         <div class="card-body">
                             <i class="bi bi-building" style="font-size: 3rem;"></i>
                             <h5 class="card-title mt-3">Data Departemen</h5>
-                            <p class="card-text">Atur informasi dan struktur departemen perusahaan.</p>
+                            <p class="card-text">Informasi dan struktur departemen perusahaan.</p>
                             <a href="read_departemen.php" class="btn btn-outline-primary">Lihat Departemen</a>
                         </div>
                     </div>
@@ -110,7 +111,7 @@
                         <div class="card-body">
                             <i class="bi bi-speedometer2" style="font-size: 3rem;"></i>
                             <h5 class="card-title mt-3">Dashboard</h5>
-                            <p class="card-text">Lihat statistik dan informasi terkini dengan cepat.</p>
+                            <p class="card-text">Lihat statistik dan informasi banyak karyawan dan departemen.</p>
                             <a href="dashboard.php" class="btn btn-outline-primary">Lihat Dashboard</a>
                         </div>
                     </div>
@@ -122,7 +123,8 @@
     <!-- Footer Section -->
     <footer class="bg-dark text-white text-center py-3">
         <div class="container">
-            <p class="mb-0">&copy; <?php echo date("Y"); ?> Sistem Manajemen Kepegawaian. All rights reserved.</p>
+            <p class="mb-0">&copy; <?php echo date("Y"); ?> Andre. Sistem Manajemen Pegawai.
+            </p>
         </div>
     </footer>
 
